@@ -1,14 +1,23 @@
-import React from 'react';
-import AllPokemon from './components/AllPokemon';
+import PokemonList from './components/AllPokemon/PokemonList';
+import { client } from './utils';
 
-function App() {
-  const [state, setState] = React.useState({
-    pokemon: [],
+import React from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+
+const Wrapper = styled.div`
+  background-color: #b2f6f6;
+`;
+function App({ props }) {
+  const defaultProps = {
+    pokemonArray: [],
     status: 'loading',
     error: null,
-  });
+  };
 
-  const { status, error, pokemon } = state;
+  const [state, setState] = React.useState(props ?? defaultProps);
+
+  const { status, error, pokemonArray } = state;
 
   const endpoint =
     'https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json';
@@ -18,17 +27,18 @@ function App() {
       return { ...state, status: 'loading' };
     });
 
-    fetch(endpoint)
-      .then(async (response) => {
-        const data = await response.json();
+    client(endpoint)
+      .then((data) => {
         setState((state) => {
-          return { ...state, pokemon: data.pokemon, status: 'success' };
+          data.pokemon;
+          return { ...state, pokemonArray: data.pokemon, status: 'success' };
         });
       })
       .catch((error) => {
         setState((state) => {
           return {
-            error,
+            ...state,
+            error: error.message,
             status: 'error',
           };
         });
@@ -37,19 +47,27 @@ function App() {
     return () => {
       setState({});
     };
-  }, []);
+  }, [setState]);
 
   return (
-    <>
+    <Wrapper>
       {status === 'loading' ? (
-        'Loading'
+        <div>Loading</div>
       ) : status === 'error' ? (
-        'Something Went Wrong Fetching the Data'
+        <div>{error}</div>
       ) : (
-        <AllPokemon pokemon={pokemon} />
+        <PokemonList pokemonArray={pokemonArray} />
       )}
-    </>
+    </Wrapper>
   );
 }
+
+App.propTypes = {
+  props: PropTypes.shape({
+    pokemonArray: PropTypes.arrayOf(PropTypes.string),
+    status: PropTypes.string,
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.null]),
+  }),
+};
 
 export default App;

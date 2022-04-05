@@ -1,15 +1,12 @@
-export function client(endpoint, customConfig = {}) {
+export async function client(endpoint, customConfig = {}) {
   const config = {
     method: 'GET',
     ...customConfig,
   };
-
-  return window.fetch(`${endpoint}`, config).then(async (response) => {
-    const data = await response.json();
-    if (response.ok) {
-      return data;
-    } else {
-      return Promise.reject(data);
-    }
-  });
+  const res = await fetch(`${endpoint}`, config);
+  if (!res.ok) {
+    throw new Error(`Request failed with status ${res.status}`);
+  }
+  const data = await res.json();
+  return data;
 }
