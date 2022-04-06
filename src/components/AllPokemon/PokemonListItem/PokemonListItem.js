@@ -50,16 +50,12 @@ PokemonListItem.propTypes = {
     spawn_time: PropTypes.string,
     multipliers: PropTypes.arrayOf(PropTypes.number),
     weaknesses: PropTypes.arrayOf(PropTypes.string),
-    next_evolution: [
-      {
+    next_evolution: PropTypes.arrayOf(
+      PropTypes.shape({
         num: PropTypes.string,
         name: PropTypes.string,
-      },
-      {
-        num: PropTypes.string,
-        name: PropTypes.string,
-      },
-    ],
+      })
+    ),
   }),
 };
 

@@ -17,9 +17,57 @@ const List = styled.ul`
   list-style: none;
 `;
 
-function PokemonList({ pokemonArray }) {
+function PokemonList({ pokemonArray, filterPokemon }) {
+  console.log(pokemonArray);
+  const [state, setState] = React.useState({
+    nameInput: '',
+    weaknessInput: '',
+    typeInput: '',
+  });
+  const { nameInput, weaknessInput, typeInput } = state;
+
+  React.useEffect(() => {
+    filterPokemon(nameInput, weaknessInput, typeInput);
+  }, [state]);
+
   return (
     <Wrapper>
+      <label htmlFor='name'>Name</label>
+      <input
+        id='name'
+        value={nameInput}
+        onChange={(event) => {
+          setState({
+            ...state,
+            filterType: 'name',
+            nameInput: event.target.value,
+          });
+        }}
+      />
+      <label htmlFor='weakness'>Weakness</label>
+      <input
+        id='weakness'
+        value={weaknessInput}
+        onChange={(event) => {
+          setState({
+            ...state,
+            filterType: 'weakness',
+            weaknessInput: event.target.value,
+          });
+        }}
+      />
+      <label htmlFor='type'>Type</label>
+      <input
+        id='type'
+        value={typeInput}
+        onChange={(event) => {
+          setState({
+            ...state,
+            filterType: 'type',
+            typeInput: event.target.value,
+          });
+        }}
+      />
       <List aria-label='Pokemon'>
         {pokemonArray.map((pokemon) => {
           return <PokemonListItem key={uuidv4()} pokemon={pokemon} />;
@@ -47,18 +95,15 @@ PokemonList.propTypes = {
       spawn_time: PropTypes.string,
       multipliers: PropTypes.arrayOf(PropTypes.number),
       weaknesses: PropTypes.arrayOf(PropTypes.string),
-      next_evolution: [
-        {
+      next_evolution: PropTypes.arrayOf(
+        PropTypes.shape({
           num: PropTypes.string,
           name: PropTypes.string,
-        },
-        {
-          num: PropTypes.string,
-          name: PropTypes.string,
-        },
-      ],
+        })
+      ),
     })
   ),
+  filterPokemon: PropTypes.func,
 };
 
 export default PokemonList;

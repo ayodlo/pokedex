@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import App from '../App';
 import { client } from '../utils/index';
+
+import { render, screen } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { server, rest } from '../testServer';
-import App from '../App';
 
 describe('App Component', () => {
   it('should initally have status loading', () => {
