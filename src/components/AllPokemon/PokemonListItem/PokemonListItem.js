@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const Wrapper = styled.div`
+const Wrapper = styled.li`
   display: flex;
   flex-direction: column;
   align-items: center;

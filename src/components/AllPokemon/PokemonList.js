@@ -18,7 +18,6 @@ const List = styled.ul`
 `;
 
 function PokemonList({ pokemonArray, filterPokemon }) {
-  console.log(pokemonArray);
   const [state, setState] = React.useState({
     nameInput: '',
     weaknessInput: '',

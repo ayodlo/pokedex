@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   background-color: #b2f6f6;
 `;
 
-function App({ props }) {
+function App() {
   const defaultProps = {
     pokemonArray: [],
     filteredPokemonArray: [],
@@ -17,7 +17,7 @@ function App({ props }) {
     error: null,
   };
 
-  const [state, setState] = React.useState(props ?? defaultProps);
+  const [state, setState] = React.useState(defaultProps);
 
   const { status, error, pokemonArray, filteredPokemonArray } = state;
 
@@ -85,6 +85,7 @@ function App({ props }) {
       });
     }
     setState({ ...state, filteredPokemonArray: newPokemonArray });
+    return { ...state, fillteredPokemonArray: newPokemonArray };
   }
 
   return (

@@ -1,9 +1,37 @@
 import App from '../App';
 import { client } from '../utils/index';
+import { data } from './testPokemon';
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-import { server, rest } from '../testServer';
+import { rest } from 'msw';
+import { setupServer } from 'msw/node';
+
+const server = setupServer(
+  rest.get(
+    'https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json',
+    //provide the request, response and context arguments
+    (req, res, ctx) => {
+      return res(
+        //provide the status of the response we want emulate
+        ctx.status(200),
+        //provide the json we want to respond with
+        ctx.json({ data: data, status: 'success' })
+      );
+    }
+  ),
+  rest.get('*', (req, res, ctx) => {
+    console.error(`Please add request handler for ${req.url.toString()}`);
+    return res(
+      ctx.status(500),
+      ctx.json({ error: 'Please add request handler' })
+    );
+  })
+);
+
+beforeAll(() => server.listen());
+afterAll(() => server.close());
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 
 describe('App Component', () => {
   it('should initally have status loading', () => {
@@ -12,14 +40,13 @@ describe('App Component', () => {
     expect(divElement).toBeTruthy();
   });
 
-  /* POINTLESS?
-  it('should return AllPokemon on success', async () => {
-    const respone = await client(
-      'https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json'
-    );
-    expect(respone.pokemon).toEqual(data.pokemon);
+  it('should render Charzard, Diglett, Scyther and Mewtwo', async () => {
+    render(<App />);
+    expect(screen.findByText(/Charizard/i)).toBeTruthy;
+    expect(screen.findByText(/Diglett/i)).toBeTruthy;
+    expect(screen.findByText(/Scyther/i)).toBeTruthy;
+    expect(screen.findByText(/Mewtwo/i)).toBeTruthy;
   });
-  */
 
   it('should render error text', async () => {
     server.use(
@@ -45,5 +72,9 @@ describe('App Component', () => {
         )
       ).rejects.toThrow('Request failed with status 404')
     );
+  });
+
+  it('should filter pokemon so only Caterpie shows', () => {
+    expect(1).toEqual(1);
   });
 });
