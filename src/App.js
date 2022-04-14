@@ -1,115 +1,41 @@
-import PokemonList from './components/AllPokemon/PokemonList';
-import { client } from './utils';
-
 import React from 'react';
+
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { v4 } from 'uuid';
 
-const Wrapper = styled.div`
-  background-color: #b2f6f6;
-`;
-
-function App() {
-  const defaultProps = {
-    pokemonArray: [],
-    filteredPokemonArray: [],
-    status: 'loading',
-    error: null,
-  };
-
-  const [state, setState] = React.useState(defaultProps);
-
-  const { status, error, pokemonArray, filteredPokemonArray } = state;
-
-  const endpoint =
+function App({ myString = 'Hello World' }) {
+  const [allPokemon, setAllPokemon] = React.useState([]);
+  const endPoint =
     'https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json';
 
   React.useEffect(() => {
-    setState((state) => {
-      return { ...state, status: 'loading' };
+    fetch(endPoint).then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+      const data = await res.json();
+      console.log(data);
+      console.log(myString);
+      setAllPokemon(data.pokemon);
     });
-
-    client(endpoint)
-      .then((data) => {
-        setState((state) => {
-          data.pokemon;
-          return {
-            ...state,
-            pokemonArray: data.pokemon,
-            filteredPokemonArray: data.pokemon,
-            status: 'success',
-          };
-        });
-      })
-      .catch((error) => {
-        setState((state) => {
-          return {
-            ...state,
-            error: error.message,
-            status: 'error',
-          };
-        });
-      });
-
-    return () => {
-      setState({});
-    };
-  }, [setState]);
-
-  function filterPokemon(nameInput, weaknessInput, typeInput) {
-    let newPokemonArray = [...pokemonArray];
-
-    if (nameInput !== '') {
-      newPokemonArray = newPokemonArray.filter((pokemon) => {
-        return pokemon.name.toLowerCase().includes(nameInput.toLowerCase());
-      });
-    }
-
-    if (weaknessInput !== '') {
-      newPokemonArray = newPokemonArray.filter((pokemon) => {
-        return (
-          pokemon.weaknesses.findIndex((weakness) =>
-            weakness.toLowerCase().includes(weaknessInput.toLowerCase())
-          ) > -1
-        );
-      });
-    }
-
-    if (typeInput !== '') {
-      newPokemonArray = newPokemonArray.filter((pokemon) => {
-        return (
-          pokemon.type.findIndex((type) =>
-            type.toLowerCase().includes(typeInput.toLowerCase())
-          ) > -1
-        );
-      });
-    }
-    setState({ ...state, filteredPokemonArray: newPokemonArray });
-    return { ...state, fillteredPokemonArray: newPokemonArray };
-  }
+  }, []);
 
   return (
-    <Wrapper>
-      {status === 'loading' ? (
-        <div>Loading</div>
-      ) : status === 'error' ? (
-        <div>{error}</div>
-      ) : (
-        <PokemonList
-          pokemonArray={filteredPokemonArray}
-          filterPokemon={filterPokemon}
-        />
-      )}
-    </Wrapper>
+    <>
+      <div>Pokemon List</div>
+      <ul>
+        {allPokemon.length > 1
+          ? allPokemon.map((pokemon) => {
+              return <li key={v4()}>{pokemon.name}</li>;
+            })
+          : 'No pokemon to render'}
+      </ul>
+    </>
   );
 }
 
 App.propTypes = {
-  props: PropTypes.shape({
-    pokemonArray: PropTypes.arrayOf(PropTypes.string),
-    status: PropTypes.string,
-    error: PropTypes.string,
-  }),
+  myString: PropTypes.string,
 };
 
 export default App;
